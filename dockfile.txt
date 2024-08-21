@@ -1,0 +1,212 @@
+1. Simple Node.js Application
+  
+# Use the official Node.js image as the base image
+FROM node:14
+  
+# Set the working directory
+WORKDIR /usr/src/app
+  
+# Copy the package.json and package-lock.json
+COPY package*.json ./
+
+# Install the application dependencies
+RUN npm install
+
+# Copy the application code
+COPY . .
+
+# Expose the application port
+EXPOSE 3000
+
+# Command to run the application
+CMD ["node", "app.js"]
+
+
+
+
+  
+2. Python Flask Application
+
+# Use the official Python image as the base image
+FROM python:3.8-slim
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the requirements file
+COPY requirements.txt .
+
+# Install the application dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the application code
+COPY . .
+
+# Expose the application port
+EXPOSE 5000
+
+# Command to run the application
+CMD ["python", "app.py"]
+
+
+
+
+  
+3. Java Spring Boot Application
+
+# Use Maven to build the project
+FROM maven:3.8.1-openjdk-11-slim AS build
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the Maven project files
+COPY pom.xml .
+COPY src ./src
+
+# Build the project
+RUN mvn clean package -DskipTests
+
+# Second stage: Use a lightweight OpenJDK image
+FROM openjdk:11-jre-slim
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the jar file from the build stage
+COPY --from=build /app/target/myapp.jar myapp.jar
+
+# Expose the application port
+EXPOSE 8080
+
+# Command to run the application
+CMD ["java", "-jar", "myapp.jar"]
+
+
+
+  
+4. Go Application
+
+# Build stage: Use a Golang image to compile the application
+FROM golang:1.16 AS build
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the Go modules files
+COPY go.mod go.sum ./
+
+# Download the dependencies
+RUN go mod download
+
+# Copy the application code
+COPY . .
+
+# Build the Go application
+RUN go build -o myapp .
+
+# Second stage: Use a lightweight Alpine image
+FROM alpine:latest
+
+# Set the working directory
+WORKDIR /root/
+
+# Copy the compiled application from the build stage
+COPY --from=build /app/myapp .
+
+# Expose the application port
+EXPOSE 8080
+
+# Command to run the application
+CMD ["./myapp"]
+
+
+
+  
+5. Nginx Web Server
+
+# Use the official Nginx image as the base image
+FROM nginx:alpine
+
+# Copy the static website files
+COPY ./html /usr/share/nginx/html
+
+# Expose the HTTP port
+EXPOSE 80
+
+# No need to specify CMD as Nginx is the default command
+
+
+
+
+
+  
+6. Multi-Stage Build for React Application
+
+# Build stage: Use a Node.js image to build the React application
+FROM node:14 AS build
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the package.json and package-lock.json
+COPY package*.json ./
+
+# Install the dependencies
+RUN npm install
+
+# Copy the application code
+COPY . .
+
+# Build the React application
+RUN npm run build
+
+# Production stage: Use an Nginx image to serve the React application
+FROM nginx:alpine
+
+# Copy the built files from the build stage
+COPY --from=build /app/build /usr/share/nginx/html
+
+# Expose the HTTP port
+EXPOSE 80
+
+# No need to specify CMD as Nginx is the default command
+
+
+
+
+  
+7. .NET Core Application
+
+# Use the official .NET SDK image to build the application
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+
+# Set the working directory
+WORKDIR /src
+
+# Copy the project file
+COPY *.csproj ./
+
+# Restore dependencies
+RUN dotnet restore
+
+# Copy the remaining application code
+COPY . .
+
+# Build the application
+RUN dotnet publish -c Release -o /app
+
+# Use the runtime-only image for the final image
+FROM mcr.microsoft.com/dotnet/aspnet:6.0
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the built application from the build stage
+COPY --from=build /app .
+
+# Expose the application port
+EXPOSE 80
+
+# Command to run the application
+CMD ["dotnet", "myapp.dll"]
