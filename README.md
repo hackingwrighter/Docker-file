@@ -3,7 +3,7 @@
 
 ### what is docker:
 docker is a containerization platform for developing,packaging,shipping,and running applications.it provides the ability to run an application in an isolated enviroment called a container.makes deployment and development efficient. 
-![OIP](https://github.com/user-attachments/assets/298b4d3d-a9dd-4c05-b21a-acc64cb1ec99)
+
 
        To avoid ( this working on my mechine but not working on your mechine)
      
